@@ -1,0 +1,70 @@
+#!/bin/sh
+
+# NVIDIA_DRIVER_VER scans dpkg to guess the version, below is static value if you prefer
+
+export MY_USER=janseng
+#export NVIDIA_DRIVER_VER=`dpkg -l | grep binary\ driver | gawk '{print $2}'`
+export NVIDIA_DRIVER_VER=nvidia-346
+export NVIDIA_MOD_NAME=`echo $NVIDIA_DRIVER_VER | sed s/-/_/g`
+#export GUI=`echo $XDG_CURRENT_DESKTOP`
+#export GUI='XFCE4'
+
+if [ -z $NVIDIA_DRIVER_VER ]; then
+  echo "NVIDIA_DRIVER_VER is unset, please check binary drivers are installed or set manually"
+  exit 1
+else
+  echo "setting driver version to $NVIDIA_DRIVER_VER"
+fi
+
+#if [ -z $GUI ]; then
+#  echo "GUI is unset, please manually set"
+#  exit 1
+#else
+#  echo "setting gui to $GUI"
+#fi
+
+
+
+if [ $# = 0 ]; then
+  echo 
+  echo "Use the one of following commands:"
+  echo
+  echo "1) Switch to nvidia prime"
+  echo "2) Switch to intel graphics"
+  echo
+
+ read command
+
+  if [ "$command" = "1" ]; then
+  sudo -E nohup "$0" nvidia
+  fi
+
+  if [ "$command" = "2" ]; then
+  sudo -E nohup "$0" intel
+  fi
+
+  exit
+fi
+
+
+if [ `whoami` != "root" ]; then
+  echo "You must run it as root";
+  exit
+fi
+
+
+if [ "$1" = "nvidia" ]; then
+
+  service lightdm stop
+  prime-select nvidia
+  service lightdm restart
+fi
+
+
+if [ "$1" = "intel" ]; then
+
+  service lightdm stop
+  prime-select intel
+  service lightdm restart
+
+fi

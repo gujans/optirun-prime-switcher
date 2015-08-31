@@ -7,7 +7,7 @@ EndSection
 Section "Device"
     Identifier "nvidia"
     Driver "nvidia"
-    BusID "PCI:01:00:0"
+    BusID "PCI:03:00:0"
 EndSection
 
 Section "Screen"
