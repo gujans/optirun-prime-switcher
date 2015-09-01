@@ -1,30 +1,5 @@
 #!/bin/sh
 
-# NVIDIA_DRIVER_VER scans dpkg to guess the version, below is static value if you prefer
-
-export MY_USER=janseng
-#export NVIDIA_DRIVER_VER=`dpkg -l | grep binary\ driver | gawk '{print $2}'`
-export NVIDIA_DRIVER_VER=nvidia-346
-export NVIDIA_MOD_NAME=`echo $NVIDIA_DRIVER_VER | sed s/-/_/g`
-#export GUI=`echo $XDG_CURRENT_DESKTOP`
-#export GUI='XFCE4'
-
-if [ -z $NVIDIA_DRIVER_VER ]; then
-  echo "NVIDIA_DRIVER_VER is unset, please check binary drivers are installed or set manually"
-  exit 1
-else
-  echo "setting driver version to $NVIDIA_DRIVER_VER"
-fi
-
-#if [ -z $GUI ]; then
-#  echo "GUI is unset, please manually set"
-#  exit 1
-#else
-#  echo "setting gui to $GUI"
-#fi
-
-
-
 if [ $# = 0 ]; then
   echo 
   echo "Use the one of following commands:"
@@ -53,18 +28,24 @@ if [ `whoami` != "root" ]; then
 fi
 
 
-if [ "$1" = "nvidia" ]; then
-
+if [ "$1" = "nvidia" ] && [ `prime-select query` != "nvidia" ]
+then
   service lightdm stop
   prime-select nvidia
+  cp /home/janseng/projects/optirun-prime-switcher/xorg.conf.nvidia /etc/X11/xorg.conf
   service lightdm restart
+elif [ "$1" = "nvidia" ]; then
+  echo "You can not switch to nvidia: it is already active.";
+  glxinfo | grep OpenGL
 fi
 
 
-if [ "$1" = "intel" ]; then
-
+if [ "$1" = "intel" ] && [ `prime-select query` != "intel" ]
+then
   service lightdm stop
   prime-select intel
   service lightdm restart
-
+elif [ "$1" = "intel" ]; then
+  echo "You can not switch to intel: it is already active.";
+  glxinfo | grep OpenGL
 fi
